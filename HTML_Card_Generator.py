@@ -20,8 +20,8 @@ def generate_animation_styles(animations):
     }
     return "<style>" + "".join([styles[a] for a in animations if a in styles]) + "</style>"
 
-def generate_card_html(title, text, bg_color, shape, animation):
-    border_radius = "10px" if shape == "Rounded" else "0px"
+def generate_card_html(title, text, bg_color, shape, width, height, animation, font, text_align, padding, title_size, desc_size, title_color, desc_color):
+    border_radius = "10px" if shape == "Rounded" else "50%" if shape == "Circle" else "0px"
     animation_css = animation.lower().replace(" ", "-")
     style_block = generate_animation_styles([animation_css]) if animation != "None" else ""
 
@@ -29,15 +29,21 @@ def generate_card_html(title, text, bg_color, shape, animation):
         {style_block}
         <div style="
             background-color: {bg_color};
-            padding: 20px;
+            padding: {padding}px;
             border-radius: {border_radius};
-            width: 300px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            width: {width}px;
+            height: {height}px;
+            text-align: {text_align.lower()};
             animation: {animation_css} 1s ease;
+            font-family: {font};
+            display: flex;
+            justify-content: center;
+            align-items: center;
         ">
-            <h3>{title}</h3>
-            <p>{text}</p>
+            <div>
+                <h3 style="font-size: {title_size}px; color: {title_color};">{title}</h3>
+                <p style="font-size: {desc_size}px; color: {desc_color};">{text}</p>
+            </div>
         </div>
     """
 
@@ -52,29 +58,32 @@ tabs[0].header("Card Customization")
 card_title = tabs[0].text_input("Enter Card Title", "Card Title")
 card_desc = tabs[0].text_area("Enter Card Description", "This is a card with some description.")
 card_color = tabs[0].color_picker("Pick a Card Background Color", "#A9D0F5")
-card_shape = tabs[0].selectbox("Select Card Shape", ["Rounded", "Square"], key="card_shape")
+card_shape = tabs[0].selectbox("Select Card Shape", ["Rounded", "Square", "Circle"], key="card_shape")
 card_font = tabs[0].selectbox("Select Font Style", ["Arial", "Verdana", "Times New Roman", "Courier New"], key="card_font")
-card_border = tabs[0].selectbox("Select Border Style", ["None", "Solid", "Dashed", "Dotted", "Double", "Groove"], key="card_border")
-card_shadow = tabs[0].checkbox("Add Shadow Effect", key="card_shadow")
 card_text_align = tabs[0].selectbox("Text Alignment", ["Left", "Center", "Right"], key="card_text_align")
 card_padding = tabs[0].slider("Padding (px)", 0, 50, 20, key="card_padding")
-card_margin = tabs[0].slider("Margin (px)", 0, 50, 10, key="card_margin")
 card_title_size = tabs[0].slider("Title Font Size (px)", 12, 48, 24, key="card_title_size")
 card_desc_size = tabs[0].slider("Description Font Size (px)", 10, 36, 16, key="card_desc_size")
 card_title_color = tabs[0].color_picker("Title Color", "#000000", key="card_title_color")
 card_desc_color = tabs[0].color_picker("Description Color", "#333333", key="card_desc_color")
+card_width = tabs[0].slider("Card Width (px)", 100, 500, 300, key="card_width")
+card_height = tabs[0].slider("Card Height (px)", 100, 500, 200, key="card_height")
 
 # Enhance card customization with additional animation options
-
 card_animation = tabs[0].selectbox("Select Animation", ["None", "Bounce", "Fade-In", "Slide-In", "Rotate", "Zoom"], key="card_animation")
 
-# Fixing Card Customization Power BI Code Generation
+# Fix the border and shadow effects to ensure they are applied correctly in the card generation logic
 if card_title and card_desc:
-    card_html = generate_card_html(card_title, card_desc, card_color, card_shape, card_animation)
+    card_html = generate_card_html(
+        card_title, card_desc, card_color, card_shape, card_width, card_height, card_animation,
+        card_font, card_text_align,
+        card_padding, card_title_size, card_desc_size,
+        card_title_color, card_desc_color
+    )
     tabs[0].markdown(card_html, unsafe_allow_html=True)
     tabs[0].subheader("Generated HTML Code:")
     tabs[0].code(card_html)
-    if tabs[0].button("Convert to Power BI Code", key="card_pbi"):
+    if tabs[0].button("Convert to Power BI Code", key="card_pbi_conversion"):
         # Unescape HTML and escape double quotes for DAX
         pbi_card_code = (
             "<HTML> Card Measure = \"" +
