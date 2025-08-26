@@ -1,4 +1,5 @@
 streamlit
+streamlit-tags
 pandas
 matplotlib
 seaborn
