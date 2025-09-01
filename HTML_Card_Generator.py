@@ -54,7 +54,7 @@ st.write("Welcome to the HTML Generator Tool! Customise cards with advanced form
 tabs = st.tabs(["Cards"])
 
 # ---------- Cards Tab ----------
-tabs[0].header("Card Customization")
+tabs[0].header("Card Customisation")
 card_title = tabs[0].text_input("Enter Card Title", "Card Title")
 card_desc = tabs[0].text_area("Enter Card Description", "This is a card with some description.")
 card_color = tabs[0].color_picker("Pick a Card Background Color", "#A9D0F5")
